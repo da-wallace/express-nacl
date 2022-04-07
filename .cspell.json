@@ -1,0 +1,42 @@
+{
+  "version": "0.1",
+  "$schema": "https://raw.githubusercontent.com/streetsidesoftware/cspell/master/cspell.schema.json",
+  "language": "en",
+  "words": [
+    "bitauth",
+    "bitjson",
+    "chunker",
+    "cimg",
+    "circleci",
+    "codecov",
+    "commitlint",
+    "Decryptor",
+    "dependabot",
+    "editorconfig",
+    "Encryptor",
+    "esnext",
+    "execa",
+    "exponentiate",
+    "globby",
+    "libauth",
+    "mkdir",
+    "nacl",
+    "originalname",
+    "prettierignore",
+    "sandboxed",
+    "secretbox",
+    "stablelib",
+    "transpiled",
+    "tweetnacl",
+    "typedoc",
+    "untracked"
+  ],
+  "flagWords": [],
+  "ignorePaths": [
+    "package.json",
+    "package-lock.json",
+    "yarn.lock",
+    "tsconfig.json",
+    "node_modules/**"
+  ]
+}
