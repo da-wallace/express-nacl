@@ -14,8 +14,8 @@ const PORT = env.get('PORT').asPortNumber() || 3000;
 const BUCKET = env.get('BUCKET').required().asString();
 
 const s3 = new AWS.S3({
-  accessKeyId: env.get('ACCESS_KEY').asString(),
-  secretAccessKey: env.get('SECRET_KEY').asString(),
+  accessKeyId: env.get('ACCESS_KEY').required().asString(),
+  secretAccessKey: env.get('SECRET_KEY').required().asString(),
 });
 
 app.post(
