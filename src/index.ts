@@ -65,7 +65,7 @@ app.get('/:id', async (req: Request, res: Response) => {
 
   const secureUrl = await prisma.secureUrl.findUnique({
     where: {
-      id: parseInt(id),
+      id,
     },
   });
 
@@ -92,7 +92,10 @@ app.get('/:id', async (req: Request, res: Response) => {
     .createReadStream();
 
   res.setHeader('Content-Type', secureUrl.mimetype);
-  res.setHeader('Content-Disposition', `attachment; ${secureUrl.name}`);
+  res.setHeader(
+    'Content-Disposition',
+    `attachment; filename="${secureUrl.name}"`
+  );
 
   return readStream
     .pipe(chunker(DEC_CHUNK_SIZE, { flush: true }))
