@@ -32,7 +32,7 @@ class SecureStorage implements multer.StorageEngine {
     file: Express.Multer.File,
     cb: (error?: Error | null, info?: Partial<Express.Multer.File>) => void
   ) {
-    const { stream, originalname, size } = file;
+    const { stream, originalname, size, mimetype } = file;
 
     const { url: secureUrl, nonce, key, hash } = generateSecureUrl();
 
@@ -65,6 +65,7 @@ class SecureStorage implements multer.StorageEngine {
         path: secureUrl,
         originalname,
         size,
+        mimetype,
       });
     });
   }

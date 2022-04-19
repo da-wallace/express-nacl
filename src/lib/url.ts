@@ -27,7 +27,7 @@ export function generateSecureUrl() {
 export function parseSecureUrl(url: string) {
   const policyUrl = new URL(url);
 
-  const hash = policyUrl.pathname.replace('/', '');
+  const hash = policyUrl.host.replace('/', '');
   const keyParam = policyUrl.searchParams.get('key');
 
   if (!keyParam) {

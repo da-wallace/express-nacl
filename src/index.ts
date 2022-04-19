@@ -1,3 +1,7 @@
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+require('dotenv').config();
+
+import { Prisma, PrismaClient } from '@prisma/client';
 import AWS from 'aws-sdk';
 import env from 'env-var';
 import express, { Request, Response } from 'express';
@@ -18,6 +22,8 @@ const s3 = new AWS.S3({
   secretAccessKey: env.get('SECRET_KEY').required().asString(),
 });
 
+const prisma = new PrismaClient();
+
 app.post(
   '/',
   multer({
@@ -26,44 +32,72 @@ app.post(
       bucket: BUCKET,
     }),
   }).single('file'),
-  (req: Request, res: Response) => {
+  async (req: Request, res: Response) => {
     if (req.file) {
-      const { originalname, path } = req.file;
+      const { originalname: name, path, mimetype } = req.file;
 
-      return res.send({ originalname, path: encodeURIComponent(path) });
+      try {
+        const data = await prisma.secureUrl.create({
+          data: {
+            name,
+            path,
+            mimetype,
+          },
+        });
+
+        return res.send({ success: true, data });
+      } catch (e) {
+        if (e instanceof Prisma.PrismaClientKnownRequestError) {
+          return res.status(500).send({ success: false, error: e.message });
+        }
+      }
     }
 
-    return res.status(500).send('File not present');
+    return res.status(500).send({
+      success: false,
+      error: 'File not present',
+    });
   }
 );
 
-app.get('/:secureUrl', async (req: Request, res: Response) => {
-  if (req.file) {
-    const { secureUrl } = req.params;
+app.get('/:id', async (req: Request, res: Response) => {
+  const { id } = req.params;
 
-    if (!secureUrl) {
-      return res.status(500).send('Secure URL param not provided');
-    }
+  const secureUrl = await prisma.secureUrl.findUnique({
+    where: {
+      id: parseInt(id),
+    },
+  });
 
-    const parsedUrl = parseSecureUrl(decodeURIComponent(secureUrl));
-
-    if (!parsedUrl) {
-      return res.status(500).send('Secure URL not recognized');
-    }
-
-    const { hash, key, nonce } = parsedUrl;
-
-    const readStream = s3
-      .getObject({ Key: hash, Bucket: BUCKET })
-      .createReadStream();
-
-    return readStream
-      .pipe(chunker(DEC_CHUNK_SIZE, { flush: true }))
-      .pipe(decryptTransform(key, nonce))
-      .pipe(res);
+  if (!secureUrl) {
+    return res.status(404).send({
+      success: false,
+      error: 'Not found',
+    });
   }
 
-  return res.status(500).send('File not present');
+  const parsedUrl = parseSecureUrl(secureUrl.path);
+
+  if (!parsedUrl) {
+    return res.status(500).send({
+      success: false,
+      error: 'Secure URL not recognized',
+    });
+  }
+
+  const { hash, key, nonce } = parsedUrl;
+
+  const readStream = s3
+    .getObject({ Key: hash, Bucket: BUCKET })
+    .createReadStream();
+
+  res.setHeader('Content-Type', secureUrl.mimetype);
+  res.setHeader('Content-Disposition', `attachment; ${secureUrl.name}`);
+
+  return readStream
+    .pipe(chunker(DEC_CHUNK_SIZE, { flush: true }))
+    .pipe(decryptTransform(key, nonce))
+    .pipe(res);
 });
 
 app.listen(PORT, function () {
