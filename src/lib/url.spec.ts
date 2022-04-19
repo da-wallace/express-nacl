@@ -1,4 +1,4 @@
-import { decode } from '@stablelib/base64';
+import { decodeURLSafe } from '@stablelib/base64';
 import test from 'ava';
 
 import { generateSecureUrl, parseSecureUrl } from './url';
@@ -29,10 +29,10 @@ test('parseSecureUrl', (t) => {
     return t.fail();
   }
 
-  const key = decode(keyParam);
+  const key = decodeURLSafe(keyParam);
   const nonce = Uint8Array.from(Buffer.from(hash, 'hex'));
 
-  t.is(parsedUrl, {
+  t.like(parsedUrl, {
     hash,
     nonce,
     key,

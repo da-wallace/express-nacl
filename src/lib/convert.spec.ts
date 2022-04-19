@@ -2,13 +2,16 @@ import test from 'ava';
 
 import { hexadecimalToUint8Array, uint8ArrayToHexadecimal } from './convert';
 
-const hex = 'FFFFFF';
+const hex = 'ffffff';
 
 test('hexadecimalToUint8Array', (t) => {
-  t.like(
-    hexadecimalToUint8Array(hex),
-    Uint8Array.from(Buffer.from(hex, 'hex'))
-  );
+  const expected = Uint8Array.from(Buffer.from(hex, 'hex'));
+  const test = hexadecimalToUint8Array(hex);
+
+  /**
+   * Conversion to string is necessary for comparison of arrays
+   */
+  t.is(test.toString(), expected.toString());
 });
 
 test('uint8ArrayToHexadecimal', (t) => {

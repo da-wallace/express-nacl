@@ -1,8 +1,11 @@
-import base64 from '@stablelib/base64';
+import { decodeURLSafe, encodeURLSafe } from '@stablelib/base64';
 import { box, randomBytes, secretbox } from 'tweetnacl';
 
 import * as convert from './convert';
 
+/**
+ * Generates a secure url for storage use
+ */
 export function generateSecureUrl() {
   const nonceKeypair = box.keyPair();
   const nonce = nonceKeypair.publicKey.slice(0, 16);
@@ -10,13 +13,17 @@ export function generateSecureUrl() {
   const key = randomBytes(secretbox.keyLength);
 
   return {
-    url: `secure://${hash}?key=${encodeURIComponent(base64.encode(key))}`,
+    url: `secure://${hash}?key=${encodeURLSafe(key)}`,
     key,
     nonce,
     hash,
   };
 }
 
+/**
+ * Parses a secure url from storage
+ * @param url Secure URL
+ */
 export function parseSecureUrl(url: string) {
   const policyUrl = new URL(url);
 
@@ -27,7 +34,7 @@ export function parseSecureUrl(url: string) {
     return false;
   }
 
-  const key = base64.decode(keyParam);
+  const key = decodeURLSafe(keyParam);
   const nonce = Uint8Array.from(Buffer.from(hash, 'hex'));
 
   return {
