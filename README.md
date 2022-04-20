@@ -13,6 +13,8 @@ Encryption? Still relying on S3 to encrypt your files? Well do I have a solution
 - [NaCl Stream](https://github.com/dchest/nacl-stream-js) Splits stream into chucks then 24-byte fullNonce is acquired by concatenating 16-byte nonce and 8-byte little-endian chunk number. (I've included rudimentary types for this library)
 - [Stream Chunker](https://github.com/creativecreature/stream-chunker) This module implements the Node transform stream interface. It keeps an internal buffer of a given size, and will spit out a chunk each time it fills up. (I've included rudimentary types for this library)
 
+![Known Vulnerabilities](https://snyk.io/test/github/{username}/{repo}/badge.svg)
+
 ## Getting Stared
 
 Clone the repo
