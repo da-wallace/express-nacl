@@ -19,6 +19,7 @@
     "esnext",
     "execa",
     "exponentiate",
+    "formdata",
     "globby",
     "libauth",
     "mkdir",

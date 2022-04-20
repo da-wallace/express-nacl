@@ -10,7 +10,7 @@ test('secureSecureUrl', (t) => {
     return t.fail();
   }
 
-  t.pass();
+  return t.pass();
 });
 
 test('parseSecureUrl', (t) => {
@@ -22,7 +22,7 @@ test('parseSecureUrl', (t) => {
 
   const testUrl = new URL(secureUrl.url);
 
-  const hash = testUrl.pathname.replace('/', '');
+  const hash = testUrl.host;
   const keyParam = testUrl.searchParams.get('key');
 
   if (!keyParam) {
@@ -32,7 +32,7 @@ test('parseSecureUrl', (t) => {
   const key = decodeURLSafe(keyParam);
   const nonce = Uint8Array.from(Buffer.from(hash, 'hex'));
 
-  t.like(parsedUrl, {
+  return t.like(parsedUrl, {
     hash,
     nonce,
     key,

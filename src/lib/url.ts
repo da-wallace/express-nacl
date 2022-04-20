@@ -1,5 +1,5 @@
 import { decodeURLSafe, encodeURLSafe } from '@stablelib/base64';
-import { box, randomBytes, secretbox } from 'tweetnacl';
+import nacl from 'tweetnacl'; // older module
 
 import * as convert from './convert';
 
@@ -7,10 +7,10 @@ import * as convert from './convert';
  * Generates a secure url for storage use
  */
 export function generateSecureUrl() {
-  const nonceKeypair = box.keyPair();
+  const nonceKeypair = nacl.box.keyPair();
   const nonce = nonceKeypair.publicKey.slice(0, 16);
   const hash = convert.uint8ArrayToHexadecimal(nonce);
-  const key = randomBytes(secretbox.keyLength);
+  const key = nacl.randomBytes(nacl.secretbox.keyLength);
 
   return {
     url: `secure://${hash}?key=${encodeURLSafe(key)}`,

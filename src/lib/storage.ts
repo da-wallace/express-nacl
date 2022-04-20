@@ -1,6 +1,7 @@
 import { PassThrough } from 'stream';
 
-import * as AWS from 'aws-sdk';
+import { S3Client } from '@aws-sdk/client-s3';
+import { Upload } from '@aws-sdk/lib-storage';
 import multer from 'multer';
 import chunker from 'stream-chunker';
 
@@ -8,7 +9,7 @@ import { ENC_CHUNK_SIZE, encryptTransform } from './nacl';
 import { generateSecureUrl } from './url';
 
 type StorageOpts = {
-  s3: AWS.S3;
+  s3: S3Client;
   bucket: string;
 };
 
@@ -19,7 +20,7 @@ export interface StorageRequestBody extends Express.Request {
 }
 
 class SecureStorage implements multer.StorageEngine {
-  private s3: AWS.S3;
+  private s3: S3Client;
   private bucket: string;
 
   constructor(opts: StorageOpts) {
@@ -39,35 +40,40 @@ class SecureStorage implements multer.StorageEngine {
     const readStream = stream;
     const s3 = this.s3;
 
-    const uploadFromStream = () => {
-      const pass = new PassThrough();
-      const fileData = {
-        Key: hash,
-        Body: pass,
-        Bucket: this.bucket,
-      };
-      const promise = s3.upload(fileData).promise();
-      return {
-        writeStream: pass,
-        promise,
-      };
-    };
+    const pass = new PassThrough();
 
-    const uploadStream = uploadFromStream();
+    const fileData = {
+      Key: hash,
+      Body: pass,
+      Bucket: this.bucket,
+    };
 
     readStream
       .pipe(chunker(ENC_CHUNK_SIZE, { flush: true }))
       .pipe(encryptTransform(key, nonce))
-      .pipe(uploadStream.writeStream);
+      .pipe(pass);
 
-    uploadStream.promise.then(() => {
-      cb(null, {
-        path: secureUrl,
-        originalname,
-        size,
-        mimetype,
-      });
+    const upload = new Upload({
+      client: s3,
+      leavePartsOnError: false, // optional manually handle dropped parts
+      params: fileData,
     });
+
+    upload
+      .done()
+      .then(() => {
+        cb(null, {
+          path: secureUrl,
+          originalname,
+          size,
+          mimetype,
+        });
+      })
+      .catch((err: Error) => {
+        if (err) {
+          cb(err);
+        }
+      });
   }
   /**
    * This function isn't needed. Because we are streaming
