@@ -66,3 +66,16 @@ test.serial('get secure file', async (t) => {
 
   t.is(response.length, file.length);
 });
+
+test.serial('delete s3 file', async (t) => {
+  const options = {
+    method: 'delete',
+  };
+
+  const response = await fetch(
+    t.context.prefixUrl + secureUrl.id,
+    options
+  ).then((res) => res.json());
+
+  t.is(response.success, true);
+});

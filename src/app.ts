@@ -1,7 +1,7 @@
 import { Readable } from 'stream';
 
 import { S3 } from '@aws-sdk/client-s3';
-import { Prisma, PrismaClient } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import env from 'env-var';
 import express, { Request, Response } from 'express';
 import multer from 'multer';
@@ -9,7 +9,8 @@ import chunker from 'stream-chunker';
 
 import { DEC_CHUNK_SIZE, decryptTransform } from './lib/nacl';
 import { secureStorage } from './lib/storage';
-import { parseSecureUrl } from './lib/url';
+import { prisma } from './prisma';
+import { getSecureUrlFromId } from './services/secureUrl';
 
 export const app = express();
 
@@ -22,8 +23,6 @@ const s3 = new S3({
   },
   region: 'us-east-1',
 });
-
-const prisma = new PrismaClient();
 
 app.post(
   '/',
@@ -64,20 +63,7 @@ app.post(
 app.get('/:id', async (req: Request, res: Response) => {
   const { id } = req.params;
 
-  const secureUrl = await prisma.secureUrl.findUnique({
-    where: {
-      id,
-    },
-  });
-
-  if (!secureUrl) {
-    return res.status(404).send({
-      success: false,
-      error: 'Not found',
-    });
-  }
-
-  const parsedUrl = parseSecureUrl(secureUrl.path);
+  const parsedUrl = await getSecureUrlFromId(id);
 
   if (!parsedUrl) {
     return res.status(500).send({
@@ -90,10 +76,10 @@ app.get('/:id', async (req: Request, res: Response) => {
 
   const response = await s3.getObject({ Key: hash, Bucket: BUCKET });
 
-  res.setHeader('Content-Type', secureUrl.mimetype);
+  res.setHeader('Content-Type', parsedUrl.mimetype);
   res.setHeader(
     'Content-Disposition',
-    `attachment; filename="${secureUrl.name}"`
+    `attachment; filename="${parsedUrl.name}"`
   );
 
   if (!response.Body) {
@@ -107,4 +93,33 @@ app.get('/:id', async (req: Request, res: Response) => {
     .pipe(chunker(DEC_CHUNK_SIZE, { flush: true }))
     .pipe(decryptTransform(key, nonce))
     .pipe(res);
+});
+
+app.delete('/:id', async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  const parsedUrl = await getSecureUrlFromId(id);
+
+  if (!parsedUrl) {
+    return res.status(500).send({
+      success: false,
+      error: 'Secure URL not recognized',
+    });
+  }
+
+  try {
+    await s3.deleteObject({
+      Bucket: BUCKET,
+      Key: parsedUrl.hash,
+    });
+
+    return res.send({
+      success: true,
+    });
+  } catch (e) {
+    return res.status(404).send({
+      success: false,
+      error: 'File not found',
+    });
+  }
 });
