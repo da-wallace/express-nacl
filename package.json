@@ -114,7 +114,8 @@
     },
     "nodeArguments": [
       "--experimental-specifier-resolution=node"
-    ]
+    ],
+    "workerThreads": false
   },
   "config": {
     "commitizen": {
