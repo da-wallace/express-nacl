@@ -11,7 +11,7 @@ Encryption? Still relying on S3 to encrypt your files? Well do I have a solution
 - [AWS SDK v3](https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/clients/client-s3/index.html) AWS SDK for JavaScript S3 Client for Node.js, Browser and React Native.
 - [Prisma](https://github.com/prisma/prisma) Prisma is a next-generation ORM. This is entirely unnecessary. Was used only to complete the idea.
 - [NaCl Stream](https://github.com/dchest/nacl-stream-js) Splits stream into chucks then 24-byte fullNonce is acquired by concatenating 16-byte nonce and 8-byte little-endian chunk number. (I've included rudimentary types for this library)
-- [Stream Chunker](https://github.com/creativecreature/stream-chunker) This module implements the Node transform stream interface. It keeps an internal buffer of a given size, and will spit out a chunk each time it fills up.
+- [Stream Chunker](https://github.com/creativecreature/stream-chunker) This module implements the Node transform stream interface. It keeps an internal buffer of a given size, and will spit out a chunk each time it fills up. (I've included rudimentary types for this library)
 
 ## Getting Stared
 
