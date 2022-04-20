@@ -1,6 +1,6 @@
 # Express-NaCl
 
-Encryption? Still relying on S3 to encrypt your files? Well do I have a solution for you. This quick example shows and easy way of encrypting your files in transit using a fun library call NaCl(Salt). It was more a lesson in using streaming and encryption in route. There's also some fun ideas about how to store/parse salts and file names.
+Encryption? Still relying on S3 to encrypt your files? Well do I have a solution for you. This quick example shows and easy way of encrypting your files in transit using a fun library called NaCl(Salt). It was more a lesson in using streaming and encryption in route. There's also some fun ideas about how to store/parse salts and file names. All presented as research done and shared.
 
 ## Libraries
 
