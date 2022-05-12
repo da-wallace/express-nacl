@@ -46,7 +46,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.72.0",
-    "@aws-sdk/lib-storage": "^3.72.0",
+    "@aws-sdk/lib-storage": "^3.74.0",
     "@bitauth/libauth": "^1.17.1",
     "@prisma/client": "^3.12.0",
     "@stablelib/base64": "^1.0.1",
