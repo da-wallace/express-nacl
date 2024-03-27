@@ -51,7 +51,7 @@
     "@prisma/client": "^3.12.0",
     "@stablelib/base64": "^1.0.1",
     "env-var": "^7.1.1",
-    "express": "^4.17.3",
+    "express": "^4.19.2",
     "multer": "^1.4.4",
     "nacl-stream": "^0.3.5",
     "stream-chunker": "^1.2.8",
