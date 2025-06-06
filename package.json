@@ -52,7 +52,7 @@
     "@stablelib/base64": "^1.0.1",
     "env-var": "^7.1.1",
     "express": "^4.17.3",
-    "multer": "^1.4.4",
+    "multer": "^2.0.1",
     "nacl-stream": "^0.3.5",
     "stream-chunker": "^1.2.8",
     "tweetnacl": "^1.0.3"
